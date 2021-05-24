@@ -3,11 +3,24 @@ import axios from 'axios';
 
 const Search = () => {
     const [term, setTerm] = useState('programming')
+    const [debouncedTerm, setDebouncedTerm] = useState(term)
     const [results, setResults] = useState([])
 
-    console.log(results)
+    // Run anytime term changes (user types)
+    useEffect(() => {
+        // queue up change to debouncedTerm that is going to execute in 1 sec
+        const timerId = setTimeout(()=> {
+            setDebouncedTerm(term);
+        }, 1000)
 
-    // cannot mark with async, will get error
+        // if user changes term too quickly, will clear and set up another timer
+        return () => {
+            clearTimeout(timerId);
+        };
+    }, [term])
+
+    // Run when component first rendered on screen and when there is change to debouncedTerm
+    // Call search, take results, update piece of state
     useEffect(() => {
         const search = async () => {
             const { data } = await axios.get('https://en.wikipedia.org/w/api.php', {
@@ -16,26 +29,13 @@ const Search = () => {
                     list: 'search',
                     origin: '*',
                     format: 'json',
-                    srsearch: term
+                    srsearch: debouncedTerm
                 }
             })
             setResults(data.query.search);
         };
-
-        if (term && !results.length) {
-            search();
-        } else {
-            const timeoutId = setTimeout(() => {
-                if (term) {
-                    search();
-                 }
-            }, 1000);
-    
-            return () => {
-                clearTimeout(timeoutId);
-            }
-        }
-    }, [term])
+        search();
+    }, [debouncedTerm])
 
     const renderedResults = results.map((result) => {
         return (
