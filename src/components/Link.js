@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Link = ({clasName, href, children}) => {
+const Link = ({className, href, children}) => {
     const onClick = (event) => {
         if (event.metaKey || event.ctrlKey) {
             return;
@@ -13,7 +13,7 @@ const Link = ({clasName, href, children}) => {
     };
 
     return (
-        <a onClick={onClick} className={clasName} href={href}>
+        <a onClick={onClick} className={className} href={href}>
             {children}
        </a>
     );
